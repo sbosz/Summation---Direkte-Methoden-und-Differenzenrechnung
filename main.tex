@@ -1,0 +1,611 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel} 
+\usepackage{graphicx} 
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools} 
+\usepackage{csquotes}  
+\usepackage{url}
+\usepackage{hyperref}  
+\usepackage{tikz}      
+\usepackage{float}     
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+
+\newtheorem{thm}{Satz}
+\newtheorem{cor}[thm]{Korollar}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{bsp}[thm]{Beispiel}
+\newtheorem{bem}[thm]{Bemerkung}
+
+\title{Ausarbeitung zum Proseminar Kombinatorik\\ \large Thema: Summation -- Direkte Methoden und Differenzenrechnung}
+\date{30.06.2026} 
+\author{Simon Boss\\ \url{simon.boss@uni-bielefeld.de}}
+
+\begin{document}
+
+\maketitle
+\tableofcontents 
+\newpage         
+
+\section{Einleitung und Motivation}
+Ein zentrales Problem der diskreten Mathematik und der Kombinatorik besteht darin, geschlossene Darstellungen für Folgen und Summen zu bestimmen. Häufig führt das systematische Abzählen auf endliche Summen der Form:
+\begin{align*}
+    S_n = \sum_{k=a}^b g(k)
+\end{align*}
+Unter einer \textit{geschlossenen Form} versteht man eine Darstellung, die ohne explizite Summenzeichen auskommt und sich durch eine endliche Kombination elementarer Operationen und bekannter Funktionen ausdrücken lässt. Das klassische, schrittweise Aufaddieren per Hand benötigt eine Anzahl von Rechenschritten, die linear in der Anzahl der Summanden wächst, während eine geschlossene Formel eine direkte Berechnung erlaubt.
+
+Diese Ausarbeitung, die sich eng an den Abschnitten 2.1 und 2.2 aus Martin Aigners \textit{Diskrete Mathematik} \cite{aigner} orientiert,  dient der Vorstellung systematischer Methoden zur Berechnung endlicher Summen. Zunächst behandeln wir direkte Summationsmethoden, die auf algebraischen Umformungen, Indexverschiebungen und Induktionsverfahren beruhen. Anschließend stellen wir den Zusammenhang zur Analysis her und führen die grundlegenden Begriffe und Methoden der Differenzenrechnung ein.
+
+\section{Direkte Methoden der Summation}
+Viele Summen lassen sich durch algebraische Grundregeln vereinfachen. Zu diesen Regeln zählen die Linearität des Summenzeichens, das Abspalten von Randtermen sowie die Indexverschiebung.
+
+\subsection{Das Prinzip der Indextransformation}
+Die Indexverschiebung ist ein elementares Werkzeug, um die Grenzen einer Summe an andere Ausdrücke anzupassen oder Terme zu vereinfachen. Das Prinzip besagt, dass eine Verschiebung der Laufgrenzen durch eine entgegengesetzte Operation im Inneren der Summe ausgeglichen werden muss. Es gilt:
+\begin{align*}
+    \sum_{k=a}^b g(k) = \sum_{k=a+m}^{b+m} g(k-m)
+\end{align*}
+
+\begin{bsp}[Anwendung einer einfachen Indexverschiebung]
+Wir betrachten die Summe $S = \sum_{k=3}^6 k = 3 + 4 + 5 + 6 = 18$. Möchten wir die untere Grenze auf $1$ normieren, verschieben wir die Indizes um $m = -2$ nach unten. Entsprechend müssen wir im Summanden jedes $k$ durch $k - (-2) = k + 2$ ersetzen:
+\begin{align*}
+    \sum_{k=3}^6 k = \sum_{k=3-2}^{6-2} (k+2) = \sum_{k=1}^4 (k+2) = (1+2) + (2+2) + (3+2) + (4+2) = 18
+\end{align*}
+\end{bsp}
+
+\subsection{Die Isolation von Randtermen}
+Eine häufig verwendete Methode zur Berechnung von Summen besteht darin, einzelne Summanden gezielt zu isolieren. Insbesondere kann das Herauslösen des ersten oder letzten Terms einer Summe dazu führen, dass sich eine Beziehung zwischen verschiedenen Summen ergibt. Auf diese Weise lassen sich häufig geschlossene Formeln herleiten.
+
+\begin{bsp}[Herleitung der geometrischen Reihe]
+Wir betrachten die Summe $S_n = \sum_{k=0}^n q^k$ für ein $q \neq 1$. Wir stellen $S_{n+1}$ nun auf zwei verschiedene Weisen dar:
+\begin{enumerate}
+    \item Abspalten des letzten Terms:
+    \begin{align*}
+        S_{n+1} = S_n + q^{n+1}
+    \end{align*}
+    \item Abspalten des ersten Terms und anschließende Indexverschiebung. Hierbei nutzen wir das Distributivgesetz für endliche Summen, um den gemeinsamen Faktor $q$ auszuklammern:
+    \begin{align*}
+        S_{n+1} = \sum_{k=0}^{n+1} q^k = q^0 + \sum_{k=1}^{n+1} q^k = 1 + \sum_{k=0}^n q^{k+1} = 1 + q \sum_{k=0}^n q^k = 1 + q S_n
+    \end{align*}
+\end{enumerate}
+Setzen wir diese beiden gleichwertigen Ausdrücke für $S_{n+1}$ gleich, erhalten wir die lineare Gleichung:
+\begin{align*}
+    S_n + q^{n+1} = 1 + q S_n \Longleftrightarrow S_n - q S_n = 1 - q^{n+1} \Longleftrightarrow S_n(1 - q) = 1 - q^{n+1}
+\end{align*}
+Da $q \neq 1$ vorausgesetzt wurde, können wir durch $(1-q)$ dividieren und erhalten die bekannte Summenformel der geometrischen Reihe:
+\begin{align*}
+    \sum_{k=0}^n q^k = \frac{1 - q^{n+1}}{1 - q} = \frac{q^{n+1} - 1}{q - 1}
+\end{align*}
+\end{bsp}
+
+\subsection{Vollständige Induktion und ihre Grenzen}
+Hat man durch numerisches Experimentieren oder Heuristiken eine Vermutung für eine geschlossene Formel aufgestellt, ist die vollständige Induktion das Standardverfahren zum Beweis.
+
+\begin{thm}
+Für alle $n \in \mathbb{N}$ gilt für die Summe der ersten $n$ ungeraden natürlichen Zahlen:
+\begin{align*}
+    \sum_{k=1}^n (2k - 1) = n^2
+\end{align*}
+\end{thm}
+
+\begin{proof}
+Wir führen den Beweis mittels vollständiger Induktion über $n$.
+
+\paragraph{Induktionsanfang ($n=1$):} Einsetzen auf der linken und rechten Seite liefert:
+\begin{align*}
+\sum_{k=1}^1 (2k-1) = 2(1)-1 = 1 = 1^2
+\end{align*}
+
+\paragraph{Induktionsschritt ($n \rightarrow n+1$):} Die Induktionsvoraussetzung (IV) besagt, dass die Behauptung für ein festes, aber beliebiges $n \in \mathbb{N}$ korrekt ist. Wir untersuchen nun den Ausdruck für $n+1$:
+\begin{align*}
+    \sum_{k=1}^{n+1} (2k - 1) &= \left( \sum_{k=1}^n (2k - 1) \right) + \Big(2(n+1) - 1\Big) \\
+    &\stackrel{\text{IV}}{=} n^2 + (2n + 2 - 1) \\
+    &= n^2 + 2n + 1 \\
+    &= (n+1)^2
+\end{align*}
+Die algebraische Umformung liefert exakt die Behauptung für $n+1$. Damit ist der Satz bewiesen.
+\end{proof}
+
+Obwohl dieser Beweis einfach und kurz ist, zeigt sich ein grundsätzliches Problem der vollständigen Induktion: Die Methode ist rein verifizierend. Sie gibt keinerlei Aufschluss darüber, wie man auf den Ausdruck $n^2$ kommt, wenn man ihn nicht bereits vorab erraten hat. Die geometrische Veranschaulichung in Abbildung \ref{fig:ungerade_summe} liefert im Gegensatz zur vollständigen Induktion auch eine intuitive Erklärung, warum die Formel gilt.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.6]
+    % n=1 (1 Punkt)
+    \draw[fill=black] (0,0) circle (4pt);
+    % n=2 (+3 Punkte)
+    \draw[fill=gray] (1,0) circle (4pt);
+    \draw[fill=gray] (1,1) circle (4pt);
+    \draw[fill=gray] (0,1) circle (4pt);
+    % n=3 (+5 Punkte)
+    \draw[fill=lightgray] (2,0) circle (4pt);
+    \draw[fill=lightgray] (2,1) circle (4pt);
+    \draw[fill=lightgray] (2,2) circle (4pt);
+    \draw[fill=lightgray] (1,2) circle (4pt);
+    \draw[fill=lightgray] (0,2) circle (4pt);
+    
+    \draw[dashed] (-0.4,-0.4) rectangle (0.5,0.5);
+    \draw[dashed] (-0.5,-0.5) rectangle (1.5,1.5);
+    \draw[dashed] (-0.6,-0.6) rectangle (2.5,2.5);
+\end{tikzpicture}
+\caption{Die Geometrische Veranschaulichung zeigt das schrittweise Hinzufügen der nächsten ungeraden Zahl ($1$, dann $3$, dann $5$). So bildet sich stets ein perfektes $n \times n$-Quadrat mit der Gesamtpunktzahl $n^2$.}
+\label{fig:ungerade_summe}
+\end{figure}
+
+\subsection{Die Vorwärts-Rückwärts-Induktion}
+In manchen Fällen erweist sich der direkte Schritt von $n$ auf $n+1$ als schwierig. Das Lehrbuch von Martin Aigner führt an dieser Stelle eine besondere Variante der vollständigen Induktion ein, um eine alternative Induktionsmethode zu zeigen \cite{aigner}. 
+
+\begin{bem}[Thematische Einordnung]
+Um das Prinzip dieser Induktionsvariante zu demonstrieren, betrachten wir kurz ein klassisches Resultat über Mittelwerte: Die Ungleichung zwischen dem arithmetischen und geometrischen Mittel (AGM-Ungleichung). Dieses Beispiel dient im Folgenden als Beispiel für Cauchys Beweismethode.
+\end{bem}
+
+\begin{thm}[AGM-Ungleichung]
+Für beliebige Zahlen $a_1, a_2, \dots, a_n \in \mathbb{R}_{\ge 0}$ gilt:
+\begin{align*}
+    \sqrt[n]{a_1 a_2 \cdots a_n} \le \frac{a_1 + a_2 + \dots + a_n}{n}
+\end{align*}
+\end{thm}
+Um diese Aussage zu beweisen, führte Augustin-Louis Cauchy die sogenannte \textit{Vorwärts-Rückwärts-Induktion} ein. Hierbei zeigt man den Induktionsanfang für $n=2$ und beweist anschließend zwei separate Schritte:
+\begin{enumerate}
+    \item \textbf{Vorwärtsschritt ($n \rightarrow 2n$):} Wenn die Aussage für $n$ gilt, dann gilt sie auch für $2n$.
+    \item \textbf{Rückwärtsschritt ($n \rightarrow n-1$):} Wenn die Aussage für $n$ gilt, dann gilt sie auch für $n-1$.
+\end{enumerate}
+Da zu jeder natürlichen Zahl $n$ eine Zweierpotenz $2^m$ mit $2^m \ge n$ existiert, erreicht man durch wiederholte Anwendung des Vorwärtsschritts zunächst eine solche Zweierpotenz. Anschließend gelangt man mittels des Rückwärtsschritts zu allen kleineren natürlichen Zahlen.
+
+\begin{proof}[Beweisskizze des Vorwärts- und Rückwärtsschritts]
+\quad Der folgende Beweis wird nur skizziert, da er primär der Illustration der induktiven Methode dient und der vollständige Beweis langwierig ist und vom methodischen Kern ablenkt. 
+
+\paragraph{Basisfall ($n=2$):} 
+Für zwei nicht-negative reelle Zahlen $a_1, a_2 \in \mathbb{R}_{\ge 0}$ nutzen wir die fundamentale Eigenschaft, dass das Quadrat jeder reellen Zahl nicht-negativ ist. Angewendet auf die Differenz der Quadratwurzeln $(\sqrt{a_1} - \sqrt{a_2})^2 \ge 0$ ergibt sich nach der zweiten binomischen Formel:
+\begin{align*}
+    (\sqrt{a_1})^2 - 2\sqrt{a_1}\sqrt{a_2} + (\sqrt{a_2})^2 &\ge 0 \\
+    a_1 - 2\sqrt{a_1 a_2} + a_2 &\ge 0 \\
+    a_1 + a_2 &\ge 2\sqrt{a_1 a_2} \\
+    \frac{a_1 + a_2}{2} &\ge \sqrt{a_1 a_2}
+\end{align*}
+Damit ist die Aussage für den Basisfall $n=2$ formal bewiesen.
+
+\paragraph{1. Vorwärtsschritt ($n \rightarrow 2n$):}
+Gilt die Aussage für $n$, so gruppieren wir $2n$ Variablen paarweise in zwei Blöcke. Die sukzessive Anwendung der Induktionsvoraussetzung (für $n$) und des Basisfalls ($n=2$) liefert die Gültigkeit für $2n$. Für $n=4$ ergibt sich beispielsweise:
+\begin{align*}
+    \frac{a_1 + a_2 + a_3 + a_4}{4} &= \frac{\frac{a_1+a_2}{2} + \frac{a_3+a_4}{2}}{2} \ge \sqrt{\left(\frac{a_1+a_2}{2}\right) \left(\frac{a_3+a_4}{2}\right)} \\
+    &\ge \sqrt{\sqrt{a_1 a_2} \cdot \sqrt{a_3 a_4}} = \sqrt[4]{a_1 a_2 a_3 a_4}
+\end{align*}
+
+\paragraph{2. Rückwärtsschritt ($n \rightarrow n-1$):}
+Wir nehmen an, die AGM-Ungleichung sei für $n$ Elemente wahr. Nun betrachten wir $n-1$ Variablen $a_1, a_2, \dots, a_{n-1}$. Die Idee besteht darin, ein zusätzliches $n$-tes Element hinzuzufügen, welches exakt dem arithmetischen Mittelwert $\mu$ der ersten $n-1$ Elemente entspricht:
+\begin{align*}
+    \mu = \frac{a_1 + a_2 + \dots + a_{n-1}}{n-1} \quad \Longleftrightarrow \quad (n-1)\cdot\mu = a_1 + a_2 + \dots + a_{n-1}
+\end{align*}
+Wir wenden nun die als wahr vorausgesetzte AGM-Ungleichung für $n$ Variablen auf die Menge $\{a_1, a_2, \dots, a_{n-1}, \mu\}$ an. Das arithmetische Mittel dieser $n$ Elemente vereinfacht sich durch Substitution der Teil-Summe:
+\begin{align*}
+    \frac{a_1 + a_2 + \dots + a_{n-1} + \mu}{n} = \frac{(n-1)\cdot\mu + \mu}{n} = \frac{n\cdot\mu}{n} = \mu
+\end{align*}
+Da sich die linke Seite der Ungleichung zu $\mu$ reduziert, lautet die $n$-elementige AGM-Ungleichung für unsere gewählte Belegung:
+\begin{align*}
+    \mu &\ge \sqrt[n]{a_1 \cdot a_2 \cdot \dots \cdot a_{n-1} \cdot \mu}
+\end{align*}
+Um diese Relation nach der gesuchten $(n-1)$-elementigen Form aufzulösen, isolieren wir das Produkt durch schrittweise algebraische Umformungen (unter der für den nichttrivialen Fall geltenden Annahme $\mu > 0$):
+\begin{align*}
+    \text{Potenzieren mit } n: \quad \mu^n &\ge a_1 \cdot a_2 \cdot \dots \cdot a_{n-1} \cdot \mu \\
+    \text{Division durch } \mu: \quad \mu^{n-1} &\ge a_1 \cdot a_2 \cdot \dots \cdot a_{n-1} \\
+    \text{Ziehen der } (n-1)\text{-ten Wurzel}: \quad \mu &\ge \sqrt[n-1]{a_1 \cdot a_2 \cdot \dots \cdot a_{n-1}}
+\end{align*}
+Ersetzen wir im letzten Schritt das $\mu$ auf der linken Seite wieder durch seine ursprüngliche Definition, erhalten wir exakt die AGM-Ungleichung für $n-1$ Variablen:
+\begin{align*}
+    \frac{a_1 + a_2 + \dots + a_{n-1}}{n-1} \ge \sqrt[n-1]{a_1 \cdot a_2 \cdot \dots \cdot a_{n-1}}
+\end{align*}
+Damit sind Vorwärts- und Rückwärtsschritt skizziert und die methodische Idee der Cauchy-Induktion illustriert.
+\end{proof}
+
+\subsection{Doppelsummen}
+Eine weitere wichtige Umformung betrifft Doppelsummen der Form $\sum_{i} \sum_{j} a_{ij}$. Solange die Summen endlich sind, darf die Reihenfolge der Summation beliebig vertauscht werden. Besonders wichtig ist dies, wenn die inneren Grenzen von der äußeren Laufvariable abhängen, wie es bei Summen oberhalb der Hauptdiagonale einer Matrix der Fall ist:
+\begin{align*}
+    \sum_{i=1}^n \sum_{j=i}^n a_{ij} = \sum_{j=1}^n \sum_{i=1}^j a_{ij}
+\end{align*}
+Anhand der Einträge einer oberen Dreiecksmatrix lässt sich dies veranschaulichen:
+\[
+\begin{matrix}
+a_{11} & a_{12} & a_{13} & \dots & a_{1n} \\
+       & a_{22} & a_{23} & \dots & a_{2n} \\
+       &        & a_{33} & \dots & a_{3n} \\
+       &        &        & \ddots & \vdots \\
+       &        &        &        & a_{nn}
+\end{matrix}
+\]
+Die zeilenweise Summation entspricht hierbei der linken Seite der Identität, während die spaltenweise Summation der rechten Seite entspricht.
+
+\begin{bsp}[Abzählen einer Dreiecksmatrix]
+Ein klassisches Beispiel für den Nutzen dieser Vertauschung ist das Aufsummieren von Einsen über eine obere Dreiecksmatrix:
+\begin{align*}
+    \sum_{i=1}^n \sum_{j=i}^n 1 = \sum_{j=1}^n \sum_{i=1}^j 1 = \sum_{j=1}^n j = \frac{n(n+1)}{2}
+\end{align*}
+Durch den Wechsel der Summationsreihenfolge entsteht im Inneren die einfache Summe $\sum_{i=1}^j 1 = j$, was das Problem auf die bekannte gaußsche Summenformel reduziert.
+\end{bsp}
+
+\subsection{Der Summationsfaktor}
+Wie Martin Aigner in seinem Lehrwerk \cite{aigner} darlegt, stößt man bei der Untersuchung rekursiv definierter Folgen der Form $a_n = c_n a_{n-1} + f_n$ häufig an die Grenzen rein additiver Verschiebungen. Um diese Klassen von Rekursionen dennoch in den Werkzeugkasten der direkten Summation zu überführen, wird ein sogenannter \textit{Summationsfaktor} eingeführt.
+
+Das Ziel der Methode besteht darin, die gesamte Rekursionsgleichung mit einer geschickt gewählten Folge $s_n$ zu multiplizieren. Diese Folge soll so beschaffen sein, dass die verknüpften Terme auf der linken und rechten Seite eine teleskopierende Struktur annehmen. Multiplizieren wir die allgemeine lineare Rekursion erster Ordnung mit $s_n$, erhalten wir:
+\begin{align*}
+    s_n a_n = s_n c_n a_{n-1} + s_n f_n
+\end{align*}
+
+Um eine lückenlose Kette zu erzielen, erzwingen wir nun eine Bedingung an unseren Faktor: Der kombinierte Koeffizient vor $a_{n-1}$ soll exakt dem indexverschobenen Faktor entsprechen, es soll also gelten:
+\begin{align*}
+    s_n c_n = s_{n-1} \quad \Longleftrightarrow \quad s_n = \frac{s_{n-1}}{c_n}
+\end{align*}
+
+Wird diese Bedingung durch die Wahl der Faktoren erfüllt, vereinfacht sich die ursprüngliche Gleichung zu:
+\begin{align*}
+    s_n a_n = s_{n-1} a_{n-1} + s_n f_n
+\end{align*}
+
+Führen wir an dieser Stelle die Substitution $b_n = s_n a_n$ durch, vereinfacht sich die rekursive Verknüpfung zu einer einfachen Differenzengleichung, die sich als Teleskopsumme darstellt:
+\begin{align*}
+    b_n = b_{n-1} + s_n f_n \implies b_n = b_0 + \sum_{k=1}^n s_k f_k
+\end{align*}
+
+Die explizite Berechnung des benötigten Faktors $s_n$ lässt sich durch wiederholtes Einsetzen der Rekursionsbedingung allgemein ausdrücken. Setzt man rein normierend $s_0 = 1$, ergibt sich das Produkt:
+\begin{align*}
+    s_n = \frac{1}{c_n c_{n-1} \cdots c_1}
+\end{align*}
+
+\begin{bsp}[Auflösung einer linearen Rekursion]
+Wir betrachten die Rekursionsvorschrift $a_n = 2 a_{n-1} + n$ mit dem Startwert $a_0 = 1$. In der allgemeinen Notation entspricht dies den Zuweisungen $c_n = 2$ und $f_n = n$.
+\begin{enumerate}
+    \item \textbf{Berechnung des Summationsfaktors:} Nach der obigen Produktformel ergibt sich für den konstanten Koeffizienten $c_n = 2$ sofort:
+    \begin{align*}
+        s_n = \frac{1}{2 \cdot 2 \cdots 2} = \frac{1}{2^n}
+    \end{align*}
+    \item \textbf{Transformation der Gleichung:} Wir multiplizieren die gesamte ursprüngliche Rekursionsgleichung mit diesem Faktor:
+    \begin{align*}
+        \frac{a_n}{2^n} = \frac{2 a_{n-1}}{2^n} + \frac{n}{2^n} \quad \Longleftrightarrow \quad \frac{a_n}{2^n} = \frac{a_{n-1}}{2^{n-1}} + \frac{n}{2^n}
+    \end{align*}
+    \item \textbf{Substitution und Summation:} Mit der Definition $b_n = \frac{a_n}{2^n}$ und dem transformierten Startwert $b_0 = \frac{a_0}{2^0} = 1$ erhalten wir die Summenformel:
+    \begin{align*}
+        b_n = 1 + \sum_{k=1}^n \frac{k}{2^k}
+    \end{align*}
+\end{enumerate}
+Durch den Summationsfaktor haben wir die rekursive Struktur vollständig aufgelöst und das Problem auf die Berechnung einer Summe zurückgeführt. Diese verbleibende Summe lässt sich nun wiederum mit den im Folgenden behandelten Methoden bestimmen.
+\end{bsp}
+
+\section{Systematische Differenzenrechnung}
+Um Summen ohne vorheriges Raten konstruktiv zu berechnen, wechseln wir nun zur Differenzenrechnung. Diese verhält sich zur diskreten Summation analog wie die Infinitesimalrechnung der Analysis zur kontinuierlichen Integration. Die Kernbotschaft dieses Abschnitts beruht auf der präzisen strukturellen Analogie beider Welten. Für fast jedes vertraute Konzept der kontinuierlichen Analysis, wie Ableitungen, Stammfunktionen, die Potenzregel oder die Produktregel, werden wir im Folgenden ein exaktes diskretes Gegenstück herleiten.
+
+Wie im Lehrbuch \cite{aigner} führen wir die Konzepte systematisch über den Translationsoperator ein.
+
+\subsection{Der Translations- und Differenzoperator}
+Zunächst betrachten wir die grundlegende Verschiebung von Funktionen im diskreten Raum.
+
+\begin{defn}[Translationsoperator]
+Für eine reelle Funktion $f(x)$ ist der \textit{Translationsoperator} $E_a$ mit der Schrittweite $a$ definiert durch die Abbildung:
+\begin{align*}
+    E_a : f(x) \to f(x + a)
+\end{align*}
+Für den Standardfall einer ganzzahligen Schrittweite von $a = 1$ setzen wir kurz $E \coloneqq E_1$. Zudem definiert $I \coloneqq E_0$ die Identität mit $I f(x) = f(x)$. 
+\end{defn}
+
+Als diskretes Gegenstück zur kontinuierlichen Ableitung nutzen wir dieses Translationsprinzip, um die beiden zentralen Differenzenoperatoren formal über die Identität einzuführen.
+
+\begin{defn}[Differenzenoperatoren]
+Der \textit{Vorwärts-Differenzoperator} $\Delta$ und der \textit{Rückwärts-Differenzoperator} $\nabla$ sind definiert durch die algebraischen Verknüpfungen mit der Identität:
+\begin{align*}
+    \Delta &\coloneqq E - I \\
+    \nabla &\coloneqq I - E^{-1}
+\end{align*}
+Ausgeschrieben bedeuten diese Operatoren angewendet auf eine Funktion $f(x)$:
+\begin{align*}
+    \Delta f(x) &= f(x+1) - f(x) \\
+    \nabla f(x) &= f(x) - f(x-1)
+\end{align*}
+\end{defn}
+
+Beide Operatoren sind linear, das heißt für $\alpha, \beta \in \mathbb{R}$ gilt $\Delta(\alpha f + \beta g) = \alpha \Delta f + \beta \Delta g$. Im weiteren Verlauf dieser Arbeit wird primär der Vorwärts-Operator $\Delta$ genutzt, da sich mit ihm die Analogie zur klassischen Differentialrechnung besonders gut zeigen lässt. Gilt für zwei Funktionen $\Delta f(k) = g(k)$, so heißt $f$ eine \textit{diskrete Stammfunktion} von $g$. Wir schreiben dafür formal $f(k) = \sum g(k)$ als unbestimmte Summe.
+
+\subsection{Fallende und steigende Faktoriellen}
+Versucht man, den Vorwärts-Differenzenoperator auf gewöhnliche Monome wie $x^2$ anzuwenden, stellt man fest, dass die klassische Potenzregel fehlschlägt:
+\begin{align*}
+    \Delta x^2 = (x+1)^2 - x^2 = x^2 + 2x + 1 - x^2 = 2x + 1 \neq 2x
+\end{align*}
+Der Übergang zur diskreten Welt erfordert daher ein Umdenken bei den algebraischen Grundbausteinen. Wir benötigen alternative Basen von Polynomen, auf denen die Differenzenoperatoren dieselbe gradreduzierende Wirkung besitzen wie die klassische Ableitung in der Analysis. Diese harmonischen Bausteine werden durch die \textit{fallenden} und \textit{steigenden Faktoriellen} bereitgestellt.
+
+\begin{defn}[Fallende und steigende Faktoriellen]
+Für eine reelle Variable $x$ und eine Ordnung $n \in \mathbb{N}_0$ ist die \textit{fallende Faktorielle} $x^{\underline{n}}$ definiert durch das Produkt von $n$ sequentiell absteigenden Faktoren:
+\begin{align*}
+    x^{\underline{n}} \coloneqq \prod_{k=0}^{n-1} (x - k) = x(x-1)(x-2)\cdots(x-n+1)
+\end{align*}
+Spiegelbildlich dazu ist die \textit{steigende Faktorielle} $x^{\overline{n}}$ definiert durch das Produkt von $n$ sequentiell aufsteigenden Faktoren:
+\begin{align*}
+    x^{\overline{n}} \coloneqq \prod_{k=0}^{n-1} (x + k) = x(x+1)(x+2)\cdots(x+n-1)
+\end{align*}
+Für den formalen Randfall eines leeren Produkts bei $n = 0$ gilt standardgemäß $x^{\underline{0}} = x^{\overline{0}} = 1$.
+\end{defn}
+
+\begin{lem}[Die diskreten Potenzregeln]
+Für jede natürliche Zahl $n \ge 1$ gelten die folgenden gradreduzierenden Rechenregeln:
+\begin{align*}
+    \text{1.) } \Delta x^{\underline{n}} &= n \cdot x^{\underline{n-1}} \\
+    \text{2.) } \nabla x^{\overline{n}} &= n \cdot x^{\overline{n-1}}
+\end{align*}
+\end{lem}
+
+\begin{proof}
+\quad
+\paragraph{Beweis der 1. Regel (Vorwärts-Operator):}
+Wir wenden die Definition des Operators $\Delta f(x) = f(x+1) - f(x)$ direkt auf den funktionalen Term der fallenden Faktoriellen an:
+\begin{align*}
+    \Delta x^{\underline{n}} &= (x+1)^{\underline{n}} - x^{\underline{n}} \\
+    &= \Big( (x+1)x(x-1)\dots(x-n+2) \Big) - \Big( x(x-1)\dots(x-n+2)(x-n+1) \Big)
+\end{align*}
+Wir klammern den gemeinsamen Produktterm aus, welcher exakt der Definition von $x^{\underline{n-1}}$ entspricht:
+\begin{align*}
+    \Delta x^{\underline{n}} &= \Big[ x(x-1)\dots(x-n+2) \Big] \cdot \Big( (x+1) - (x-n+1) \Big) \\
+    &= x^{\underline{n-1}} \cdot \big( x + 1 - x + n - 1 \big) \\
+    &= x^{\underline{n-1}} \cdot n = n \cdot x^{\underline{n-1}}
+\end{align*}
+
+\paragraph{Beweis der 2. Regel (Rückwärts-Operator):}
+Hier nutzen wir die Definition des Rückwärts-Operators $\nabla f(x) = f(x) - f(x-1)$ für die steigende Faktorielle:
+\begin{align*}
+    \nabla x^{\overline{n}} &= x^{\overline{n}} - (x-1)^{\overline{n}} \\
+    &= \Big( x(x+1)\dots(x+n-2)(x+n-1) \Big) - \Big( (x-1)x(x+1)\dots(x+n-2) \Big)
+\end{align*}
+Auch hier isolieren wir den gemeinsamen Produktterm, welcher dieses Mal der Definition von $x^{\overline{n-1}}$ entspricht:
+\begin{align*}
+    \nabla x^{\overline{n}} &= \Big[ x(x+1)\dots(x+n-2) \Big] \cdot \Big( (x+n-1) - (x-1) \Big) \\
+    &= x^{\overline{n-1}} \cdot \big( x + n - 1 - x + 1 \big) \\
+    &= x^{\overline{n-1}} \cdot n = n \cdot x^{\overline{n-1}}
+\end{align*}
+Damit sind beide diskreten Potenzregeln formal bewiesen.
+\end{proof}
+
+\begin{cor}
+Durch die Umkehrung der Operatoren ergeben sich die unbestimmten Summenformeln für beide Faktoriellenbasen. Für eine Ordnung $n \neq -1$ gilt:
+\begin{align*}
+    \sum x^{\underline{n}} = \frac{x^{\underline{n+1}}}{n+1} \quad \text{bzw.} \quad \sum x^{\overline{n}} = \frac{x^{\overline{n+1}}}{n+1}
+\end{align*}
+\end{cor}
+
+\begin{bem}[Negative fallende Faktorielle und harmonische Zahlen]
+Analog zur Analysis lassen sich auch negative fallende Faktorielle für $n \in \mathbb{N}$ über die Kehrwerte definieren:
+\begin{align*}
+    x^{\underline{-n}} \coloneqq \frac{1}{(x+1)(x+2)\dots(x+n)}
+\end{align*}
+Für diese gilt die identische Regel $\Delta x^{\underline{-n}} = -n \cdot x^{\underline{-n-1}}$. Für den kritischen Fall $n=1$ erhält man $x^{\underline{-1}} = \frac{1}{x+1}$. Die diskrete Summation dieses Terms führt analog zur kontinuierlichen Stammfunktion von $\frac{1}{x}$ auf die \textit{harmonischen Zahlen} $H_n = \sum_{k=1}^n \frac{1}{k}$, welche somit als das diskrete Analogon des natürlichen Logarithmus gelten.
+\end{bem}
+
+\subsection{Der Fundamentalsatz der Differenzenrechnung}
+Das fundamentale Werkzeug zur Berechnung endlicher Summen basiert auf dem mathematischen Effekt einer Teleskopsumme, analog zum Hauptsatz der Differential- und Integralrechnung.
+
+\begin{thm}[Fundamentalsatz der Differenzenrechnung]
+Sei $f$ eine diskrete Stammfunktion von $g$, es gelte folglich $\Delta f(k) = g(k)$. Dann gilt für beliebige ganzzahlige Grenzen $a \le b$:
+\begin{align*}
+    \sum_{k=a}^b g(k) = f(b+1) - f(a)
+\end{align*}
+\end{thm}
+
+\begin{proof}
+Wir setzen die Definition des Differenzenoperators direkt in den Summenausdruck ein, indem wir jeden Summanden $g(k)$ durch die Identität $\Delta f(k) = f(k+1) - f(k)$ ersetzen. Schreiben wir die endliche Reihe nun explizit Glied für Glied aus, ergibt sich:
+\begin{align*}
+    \sum_{k=a}^b g(k) &= \sum_{k=a}^b \big( f(k+1) - f(k) \big) \\
+    &= \big(f(a+1) - f(a)\big) + \big(f(a+2) - f(a+1)\big) + \dots + \big(f(b+1) - f(b)\big)
+\end{align*}
+Ordnen wir die inneren Terme mittels des Assoziativgesetzes gedanklich um, erkennt man die Teleskopstruktur:
+\begin{align*}
+    \sum_{k=a}^b g(k) = -f(a) + f(a+1) - f(a+1) + f(a+2) - f(a+2) + \dots + f(b+1)
+\end{align*}
+Jeder positive Term löscht den nachfolgenden negativen Term aus. In dieser endlichen Kette überleben folglich ausschließlich der allererste subtrahierte Wert sowie der allerletzte addierte Wert:
+\begin{align*}
+    \sum_{k=a}^b g(k) = f(b+1) - f(a)
+\end{align*}
+Dies beweist den Fundamentalsatz.
+\end{proof}
+
+\subsection{Transformation von Polynomen und Stirling-Zahlen}
+Möchte man ein gewöhnliches Polynom (wie $x^n$) mithilfe des Hauptsatzes der Differenzenrechnung konstruktiv summieren, muss es zuerst aus der Standardbasis in die mathematische Basis der fallenden Faktoriellen transformiert werden. Die hierbei auftretenden kombinatorischen Umrechnungskoeffizienten nennt man \textit{Stirling-Zahlen der zweiten Art}, notiert als $S_{n,k}$ (bzw. allgemein als $S_{m,k}$ für die Aufteilung einer $m$-Menge in $k$ Klassen). Es gilt die fundamentale Basistransformation:
+\begin{align*}
+    x^n = \sum_{k=0}^n S_{n,k} x^{\underline{k}}
+\end{align*}
+
+\begin{bsp}[Explizite Basistransformation für kleine Dimensionen]
+Um die Wirkungsweise der Koeffizienten nachzuvollziehen, lösen wir die Relationen für die Dimensionen $n=1, 2$ und $3$ rein algebraisch durch systematisches Abspalten der Basisleitung auf:
+\begin{align*}
+    x^1 &= x = x^{\underline{1}} \quad \Longrightarrow S_{1,1}=1 \\
+    x^2 &= x^2 - x + x = x(x-1) + x = x^{\underline{2}} + x^{\underline{1}} \quad \Longrightarrow S_{2,2}=1,\, S_{2,1}=1 \\
+    x^3 &= x^3 - 3x^2 + 2x + 3x^2 - 2x = x(x-1)(x-2) + 3(x^{\underline{2}} + x^{\underline{1}}) - 2x^{\underline{1}} \\
+        &= x^{\underline{3}} + 3x^{\underline{2}} + 3x^{\underline{1}} - 2x^{\underline{1}} = x^{\underline{3}} + 3x^{\underline{2}} + x^{\underline{1}} \quad \Longrightarrow S_{3,3}=1,\, S_{3,2}=3,\, S_{3,1}=1
+\end{align*}
+Die resultierenden Vorfaktoren vor den fallenden Faktoriellen spiegeln exakt die Werte der Stirling-Zahlen wider.
+\end{bsp}
+
+\begin{bsp}[Konstruktive Berechnung von $\sum_{k=1}^n k^2$]
+Wir wollen die geschlossene Form für die Summe der ersten Quadratzahlen $S = \sum_{k=1}^n k^2$ fehlerfrei bestimmen, ohne das Ergebnis vorher raten zu müssen.
+\newline
+\textbf{Schritt 1: Basistransformation.}
+Mithilfe der Stirling-Zahlen transformieren wir den Summanden: $k^2 = k^{\underline{2}} + k^{\underline{1}}$.
+\newline
+\textbf{Schritt 2: Bestimmung der diskreten Stammfunktion.}
+Unter Ausnutzung der Linearität des unbestimmten Summenoperators splitten wir den Ausdruck auf und wenden die diskrete Potenzregel auf die einzelnen Basisglieder an:
+\begin{align*}
+    f(k) = \sum k^2 = \sum (k^{\underline{2}} + k^{\underline{1}}) = \sum k^{\underline{2}} + \sum k^{\underline{1}} = \frac{k^{\underline{3}}}{3} + \frac{k^{\underline{2}}}{2}
+\end{align*}
+\textbf{Schritt 3: Auswertung via Hauptsatz.}
+Wir setzen die Grenzen von $a=1$ bis $b=n$ in den Hauptsatz ein:
+\begin{align*}
+    \sum_{k=1}^n k^2 = f(n+1) - f(1) = \left( \frac{(n+1)^{\underline{3}}}{3} + \frac{(n+1)^{\underline{2}}}{2} \right) - \left( \frac{1^{\underline{3}}}{3} + \frac{1^{\underline{2}}}{2} \right)
+\end{align*}
+Da per Definition $1^{\underline{3}} = 1 \cdot 0 \cdot (-1) = 0$ und $1^{\underline{2}} = 1 \cdot 0 = 0$ gilt, fällt der gesamte hintere Teil weg ($f(1) = 0$). Wir lösen die verbleibenden Ausdrücke im Zähler auf:
+\begin{align*}
+    (n+1)^{\underline{3}} &= (n+1)n(n-1) = n(n^2 - 1) = n^3 - n \\
+    (n+1)^{\underline{2}} &= (n+1)n = n^2 + n
+\end{align*}
+Wir setzen diese Terme ein und erweitern die Brüche auf den gemeinsamem Nenner $6$:
+\begin{align*}
+    \sum_{k=1}^n k^2 &= \frac{n^3 - n}{3} + \frac{n^2 + n}{2} = \frac{2(n^3 - n) + 3(n^2 + n)}{6} \\
+    &= \frac{2n^3 - 2n + 3n^2 + 3n}{6} = \frac{2n^3 + 3n^2 + n}{6}
+\end{align*}
+Durch einfaches Ausklammern von $n$ und anschließende Faktorisierung des quadratischen Terms erhalten wir die geschlossene Identität:
+\begin{align*}
+    \sum_{k=1}^n k^2 = \frac{n(n+1)(2n+1)}{6}
+\end{align*}
+\end{bsp}
+
+\subsection{Diskrete Produktregel und partielle Summation}
+Analog zur kontinuierlichen Analysis existiert in der Differenzenrechnung ein direktes Gegenstück zur Produktregel, aus welchem sich die Formel für die partielle Summation (als diskretes Analogon zur partiellen Integration) ableiten lässt.
+
+Aus der Definition des Vorwärts-Differenzenoperators folgt für das Produkt zweier Funktionen $u(k)$ und $v(k)$:
+\begin{align*}
+    \Delta \big(u(k)v(k)\big) &= u(k + 1)v(k + 1) - u(k)v(k)
+\end{align*}
+Fügen wir nun den Term $-u(k)v(k + 1) + u(k)v(k + 1)$ ein, lässt sich der Ausdruck wie folgt umformen und faktorisieren:
+\begin{align*}
+    \Delta \big(u(k)v(k)\big) &= u(k + 1)v(k + 1) - u(k)v(k + 1) + u(k)v(k + 1) - u(k)v(k) \\
+    &= \big(u(k + 1) - u(k)\big)v(k + 1) + u(k)\big(v(k + 1) - v(k)\big) \\
+    &= \big(\Delta u(k)\big)v(k + 1) + u(k)\big(\Delta v(k)\big)
+\end{align*}
+Dies liefert die diskrete Produktregel. Unter Verwendung des Translationsoperators $E$, definiert durch $Ev(k) \coloneqq v(k+1)$, lautet diese Identität:
+\begin{align*}
+    \Delta (uv) = (\Delta u)(Ev) + u(\Delta v)
+\end{align*}
+Stellen wir diese Gleichung nun nach dem Term $u\,\Delta v$ um, erhalten wir:
+\begin{align*}
+    u\,\Delta v = \Delta(uv) - (Ev)\Delta u
+\end{align*}
+Wenden wir auf beiden Seiten den unbestimmten Summationsoperator an, so hebt sich dieser auf der rechten Seite für den Term $\Delta(uv)$ nach dem Hauptsatz auf. Es folgt die Formel der unbestimmten partiellen Summation:
+\begin{align*}
+    \sum u\,\Delta v = uv - \sum (Ev)\Delta u
+\end{align*}
+Unter Anwendung des diskreten Fundamentalsatzes ergibt sich für feste Summationsgrenzen $a \le b$ die bestimmte Form dieser Identität:
+\begin{align*}
+    \sum_{k=a}^{b} u(k)\Delta v(k) = u(b+1)v(b+1) - u(a)v(a) - \sum_{k=a}^{b} v(k+1)\Delta u(k)
+\end{align*}
+
+\begin{bsp}
+Wir demonstrieren dieses Vorgehen anhand der Summe $S_n = \sum_{k=1}^{n} k 2^k$. 
+Das Ziel bei der Wahl von $u$ und $v$ ist es, einen Faktor zu bestimmen, dessen Differenz zu einer Konstanten vereinfacht wird. Wir setzen daher:
+\begin{align*}
+    u(k) \coloneqq k \quad &\implies \quad \Delta u(k) = (k+1) - k = 1 \\
+    \Delta v(k) \coloneqq 2^k \quad &\implies \quad v(k) = 2^k \quad \Big(\text{da } \Delta 2^k = 2^{k+1} - 2^k = 2^k\Big)
+\end{align*}
+Für den verschobenen Term im zweiten Summanden gilt entsprechend $v(k+1) = 2^{k+1}$. Die Anwendung der bestimmten partiellen Summation an den Grenzen $a=1$ und $b=n$ liefert:
+\begin{align*}
+    S_n = \sum_{k=1}^{n} u(k)\Delta v(k) &= u(n+1)v(n+1) - u(1)v(1) - \sum_{k=1}^{n} v(k+1)\Delta u(k) \\
+    &= \Big( (n+1)2^{n+1} - 1 \cdot 2^1 \Big) - \sum_{k=1}^{n} 2^{k+1} \cdot 1
+\end{align*}
+Die verbleibende Summe ist eine einfache geometrische Reihe, die sich über ihre diskrete Stammfunktion $\sum 2^{k+1} = 2^{k+1}$ und erneute Anwendung des Hauptsatzes berechnen lässt:
+\begin{align*}
+    \sum_{k=1}^{n} 2^{k+1} = 2^{n+1+1} - 2^{1+1} = 2^{n+2} - 4
+\end{align*}
+Fügen wir die Terme zusammen, erhalten wir das Endergebnis:
+\begin{align*}
+    S_n &= (n+1)2^{n+1} - 2 - (2^{n+2} - 4) \\
+    &= (n+1)2^{n+1} - 2 \cdot 2^{n+1} + 2 \\
+    &= 2^{n+1}(n - 1) + 2
+\end{align*}
+\end{bsp}
+
+\subsection{Die Newton-Darstellung}
+Aus der kontinuierlichen Analysis ist bekannt, dass sich jedes Polynom $f(x) = \sum_{k=0}^{n} a_k x^k$ über seine Koeffizienten mittels der $k$-ten Ableitungen $D^k f(0)$ an der Stelle $0$ in Form der Taylor-Entwicklung darstellen lässt:
+\begin{align*}
+    a_k = \frac{D^k f(0)}{k!} \quad \Longrightarrow \quad f(x) = \sum_{k=0}^{n} \frac{D^k f(0)}{k!}\, x^k
+\end{align*}
+In der Differenzenrechnung entspricht der Vorwärts-Differenzoperator $\Delta$ dem kontinuierlichen Differentialoperator $D$, während die fallenden Faktoriellen $x^{\underline{k}}$ die Rolle der klassischen Potenzen $x^k$ übernehmen. Das exakte diskrete Analogon zur Taylor-Reihe für ein Polynom vom Grad $n$ bildet die Newton-Darstellung.
+
+\begin{thm}[Newton-Darstellung]
+Für jedes Polynom $f$ vom Grad $n$ gilt die Identität:
+\begin{align*}
+    f(x) = \sum_{k=0}^{n} \frac{\Delta^k f(0)}{k!}\, x^{\underline k} = \sum_{k=0}^{n} \Delta^k f(0) \binom{x}{k}
+\end{align*}
+\end{thm}
+
+\begin{proof}
+Wir führen den Beweis in zwei Schritten entlang der Argumentation des Lehrbuchs.
+
+\paragraph{Teil 1: Existenz und Eindeutigkeit der Darstellung.}
+Zunächst ist zu zeigen, dass sich jedes Polynom $f$ eindeutig in der Gestalt $f(x) = \sum_{k=0}^{n} b_k x^{\underline{k}}$ darstellen lässt. Wir führen hierzu eine vollständige Induktion über den Grad $n$ des Polynoms.
+\begin{itemize}
+    \item \textbf{Induktionsanfang ($n=0$):} Hat $f$ den Grad $0$, so ist das Polynom konstant, es gilt also $f = a_0$. Wegen $x^{\underline{0}} = 1$ folgt sofort $f = a_0 x^{\underline{0}}$, was die Behauptung für $n=0$ verifiziert.
+    \item \textbf{Induktionsschritt ($n-1 \to n$):} Sei $a_n$ der höchste Koeffizient des Polynoms $f$ vom Grad $n$. Wir betrachten das Polynom $g(x) \coloneqq f(x) - a_n x^{\underline{n}}$. Da sowohl $f(x)$ als auch $a_n x^{\underline{n}}$ den identischen Term $a_n x^n$ besitzen, hebt sich dieser in der Differenz auf. Folglich besitzt $g(x)$ höchstens den Grad $n-1$. Nach Induktionsvoraussetzung lässt sich $g(x)$ eindeutig in der Faktoriellenbasis darstellen. Durch Umstellung nach $f(x) = g(x) + a_n x^{\underline{n}}$ folgt die Existenz der Darstellung für den Grad $n$.
+\end{itemize}
+
+\paragraph{Teil 2: Bestimmung der Koeffizienten.}
+Es bleibt zu zeigen, dass für die Koeffizienten gilt: $b_k = \frac{\Delta^k f(0)}{k!}$.
+Wir betrachten die Basisdarstellung aus Teil 1 unter Verwendung der Laufvariable $i$:
+\begin{align*}
+    f(x) = \sum_{i=0}^{n} b_i x^{\underline{i}}
+\end{align*}
+Wir wenden nun den iterierten Vorwärts-Differenzoperator $\Delta^k$ auf beide Seiten an. Aus der diskreten Potenzregel folgt für die Basisglieder $\Delta^k x^{\underline{i}} = i(i-1)\cdots(i-k+1)x^{\underline{i-k}} = i^{\underline{k}} x^{\underline{i-k}}$. Aufgrund der Linearität von $\Delta$ ergibt sich für das Polynom:
+\begin{align*}
+    \Delta^k f(x) = \sum_{i=0}^{n} b_i \, i^{\underline{k}}\, x^{\underline{i-k}}
+\end{align*}
+Wir werten diesen Ausdruck an der Stelle $x=0$ aus und untersuchen die Summanden in Abhängigkeit von $i$ und $k$:
+\begin{enumerate}
+    \item Für alle Indizes $i < k$ gilt nach Definition der fallenden Faktoriellen $i^{\underline{k}} = 0$.
+    \item Für alle Indizes $i > k$ ist der verbleibende Potenzterm $x^{\underline{i-k}}$ an der Stelle $x=0$ gleich $0$, da stets ein Faktor $(x-0) = x$ im Produkt enthalten ist ($0^{\underline{r}} = 0$ für $r \ge 1$).
+\end{enumerate}
+In der gesamten Summe überlebt an der Stelle $x=0$ somit ausschließlich der einzige verbleibende Term für den Index $i = k$. Wegen $0^{\underline{0}} = 1$ erhalten wir:
+\begin{align*}
+    \Delta^k f(0) = b_k \cdot k^{\underline{k}} \cdot 0^{\underline{0}} = b_k \cdot k!
+\end{align*}
+Auflösen nach $b_k$ liefert direkt die gesuchte Koeffizientenformel $b_k = \frac{\Delta^k f(0)}{k!}$. Das Einsetzen in die Summenformel zeigt die Gültigkeit der ersten Identität; die äquivalente Form mit dem Binomialkoeffizienten folgt unmittelbar aus der Definition $\binom{x}{k} = \frac{x^{\underline{k}}}{k!}$.
+\end{proof}
+
+\begin{bsp}
+Wir betrachten das Polynom $f(x) = x^2$. Um dessen Darstellung in der Basis der fallenden Faktoriellen zu bestimmen, berechnen wir die iterierten Differenzen am Nullpunkt:
+\begin{align*}
+    f(0) &= 0 \\
+    \Delta f(x) &= (x+1)^2 - x^2 = 2x+1 \quad \implies \quad \Delta f(0) = 1 \\
+    \Delta^2f(x) &= \Delta(2x+1) = 2 \quad \implies \quad \Delta^2f(0) = 2
+\end{align*}
+Da alle Differenzen ab $\Delta^3 f(x)$ verschwinden, liefert die Newton-Darstellung:
+\begin{align*}
+    x^2 = \frac{0}{0!}\,x^{\underline{0}} + \frac{1}{1!}\,x^{\underline{1}} + \frac{2}{2!}\,x^{\underline{2}} = x^{\underline{1}} + x^{\underline{2}}
+\end{align*}
+Ausgeschrieben bedeutet dies $x^2 = x + x(x-1) = x + x^2 - x$, was die Transformation verifiziert.
+\end{bsp}
+
+
+\subsection{Zusammenfassung der Analogien}
+Zum Abschluss dieses Kapitels lässt sich der Zusammenhang zwischen der kontinuierlichen und der diskreten Mathematik in der folgenden Übersichtstabelle zusammenfassen:
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|l}
+\textbf{Kontinuierliche Welt (Analysis)} & \textbf{Diskrete Welt (Differenzenrechnung)} \\ \hline
+Ableitung: $f'(x) = \lim_{h \to 0} \frac{f(x+h)-f(x)}{h}$ & Vorwärts-Differenz: $\Delta f(x) = f(x+1) - f(x) \vphantom{\int}$ \\
+Stammfunktion: $F'(x) = g(x)$ & Diskrete Stammfunktion: $\Delta F(k) = g(k)$ \\
+Bestimmtes Integral: $\int_a^b g(x)\,dx$ & Endliche Summe: $\sum_{k=a}^{b} g(k)$ \\
+Hauptsatz: $\int_a^b g(x) \,dx = F(b) - F(a)$ & Fundamentalsatz: $\sum_{k=a}^b g(k) = F(b+1) - F(a)$ \\
+Natürliche Potenzen: $x^n$ & Fallende Faktoriellen: $x^{\underline n}$ \\
+Ableitung von Potenzen: $\frac{d}{dx} x^n = n x^{n-1}$ & Differenz von fallenden Faktoriellen: $\Delta x^{\underline{n}} = n x^{\underline{n-1}}$ \\
+Exponentialfunktion: $\frac{d}{dx}e^{cx} = c \cdot e^{cx}$ & Exponentialfunktion: $\Delta(1+c)^x = c \cdot (1+c)^x$ \\
+Produktregel: $\frac{d}{dx}(uv) = u'v + uv'$ & Diskrete Produktregel: $\Delta(uv) = (\Delta u)(Ev) + u(\Delta v)$ \\
+Partielle Integration: $\int u\,dv = uv-\int v\,du$ & Partielle Summation: $\sum u\,\Delta v = uv-\sum (Ev)\,\Delta u$ \\
+Taylor-Reihe: $f(x) = \sum \frac{D^k f(0)}{k!} x^k$ & Newton-Darstellung: $f(x) = \sum \frac{\Delta^k f(0)}{k!} x^{\underline{k}}$ \\
+\end{tabular}%
+}
+\end{center}
+\vspace{0.5em}
+
+\section{Schlussfolgerung und Ausblick}
+In dieser Arbeit konnte gezeigt werden, dass diskrete Summen auf zwei unterschiedliche Arten behandelt werden können. Während die direkten Methoden aus Abschnitt 2 wertvolle Werkzeuge und Beweisvarianten wie die Vorwärts-Rückwärts-Induktion liefern, leiden sie an der Notwendigkeit einer vorherigen Intuition für das Ergebnis. 
+
+Die in Abschnitt 3 etablierte systematische Differenzenrechnung löst dieses Problem. Durch die formale Einführung der Operatoren $E, \Delta$ und $\nabla$ und den Übergang von der Standardbasis zu den fallenden Faktoriellen gelingt eine vollständige algebraische Parallelisierung zur kontinuierlichen Analysis. Komplexe Summationsprobleme werden dadurch auf das Auffinden diskreter Stammfunktionen reduziert.
+Beliebige Polynome lassen sich nun rein algorithmisch über ihre diskreten Ableitungen am Nullpunkt in die Faktoriellenbasis transformieren und ohne vorherige Kenntnis des Ergebnisses berechnen. Dieses Fundament bildet die Basis für die weiterführenden Themen des Proseminars.
+
+\begin{thebibliography}{1}
+\bibitem{aigner} 
+Martin Aigner, \textit{Diskrete Mathematik}, 6. Auflage, Vieweg+Teubner, 2006.
+\end{thebibliography}
+
+\end{document}
