@@ -1,0 +1,358 @@
+\documentclass{beamer}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{tikz}
+
+% Eigene Befehle aus deiner Vorlage
+\newcommand{\R}{\mathbb{R}}% reele Zahlen
+\newcommand{\C}{\mathbb{C}}% komplexe Zahlen
+\newcommand{\Q}{\mathbb{Q}}% rationale Zahlen
+
+% Theorem-Umgebungen aus deiner Vorlage
+\newtheorem{thm}{Satz}
+\newtheorem{cor}[thm]{Korollar}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+
+% Metadaten
+\title{Summation -- Direkte Methoden und Differenzenrechnung}
+\author{Simon Boss}
+\date{30.06.2026}
+
+\begin{document}
+
+% Titelfolie
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Inhaltsverzeichnis
+\begin{frame}{Übersicht}
+    \tableofcontents
+\end{frame}
+
+\section{1. Einleitung und Motivation}
+
+\begin{frame}{Einleitung und Motivation}
+    \begin{itemize}
+        \item \textbf{Zentrales Problem der diskreten Mathematik:} Bestimmung geschlossener Darstellungen für endliche Summen der Form:
+        \[ S_{n}=\sum_{k=a}^{b}g(k) \]
+        \item \textbf{Geschlossene Form:} Eine Darstellung, die ohne explizite Summenzeichen auskommt und sich durch eine endliche Kombination elementarer Operationen ausdrücken lässt.
+        \item \textbf{Motivation:} Das schrittweise Aufaddieren per Hand benötigt eine Anzahl an Rechenschritten, die linear wächst. Eine geschlossene Formel erlaubt eine direkte Berechnung.
+        \item \textbf{Ziel des Vortrags:} Methoden zur Berechnung endlicher Summen vorstellen.
+    \end{itemize}
+\end{frame}
+
+\section{2. Direkte Methoden}
+
+\begin{frame}{Das Prinzip der Indextransformation}
+    
+        Bei der Indexverschiebung wird eine Verschiebung der Laufgrenzen durch eine entgegengesetzte Operation im Inneren ausgeglichen:
+        \[ \sum_{k=a}^{b}g(k)=\sum_{k=a+m}^{b+m}g(k-m) \]
+    
+    \textbf{Beispiel:} Normierung der Summe $S=\sum_{k=3}^{6}k$ auf Startwert 1 ($m=-2$):
+    \begin{itemize}
+        \item Grenzen: $3 \to 3-2=1$ und $6 \to 6-2=4$.
+        \item Summand: $k \to k-(-2) = k+2$.
+        \[ \sum_{k=3}^{6}k = \sum_{k=1}^{4}(k+2) = (1+2) + (2+2) + (3+2) + (4+2) = 18 \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Isolation von Randtermen}
+    \begin{itemize}
+        \item \textbf{Idee:} Einzelne Summanden gezielt isolieren (meist ersten oder letzten Term), sodass sich eine Beziehung zwischen zwei Summen ergbit.
+    \end{itemize}
+    \textbf{Beispiel: Herleitung der geometrischen Reihe} \\
+    Wir betrachten $S_{n} = \sum_{k=0}^{n}q^{k}$ und stellen $S_{n+1}$ auf zwei Weisen dar:
+    \begin{enumerate}
+        \item \textbf{Letzten Term abspalten:}
+        \[ S_{n+1} = S_n + q^{n+1} \]
+        \item \textbf{Ersten Term abspalten \& Indexverschiebung:}
+        \[ S_{n+1} = q^0 + \sum_{k=1}^{n+1}q^{k} = 1 + q \sum_{k=0}^{n}q^{k} = 1 + qS_n \]
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Isolation von Randtermen}
+    Gleichsetzen der beiden Ausdrücke für $S_{n+1}$:
+    \[ S_n + q^{n+1} = 1 + qS_n \]
+    Algebraische Umformung:
+    \begin{align*}
+        S_n - qS_n &= 1 - q^{n+1} \\
+        S_n(1 - q) &= 1 - q^{n+1}
+    \end{align*}
+    Für $q \neq 1$ folgt die bekannte geschlossene Form:
+    \[ S_n = \frac{1-q^{n+1}}{1-q} \]
+\end{frame}
+
+\begin{frame}{Vollständige Induktion}
+    Hat man durch Experimentieren oder Heuristiken eine Vermutung für eine geschlossene Formel aufgestellt, ist die Induktion das Standardverfahren für den Beweis.
+    \end{frame}
+
+\begin{frame}{Vollständige Induktion}
+        Für alle $n\in\mathbb{N}$ gilt:
+        \[ \sum_{k=1}^{n}(2k-1)=n^{2} \]
+    \textbf{Beweis:}\\
+     \textbf{(Induktionsanfang $n = 1$):}
+     \begin{align*}
+        \sum_{k=1}^{1}(2k-1) &= 2(1)-1 = 1 = 1^2
+    \end{align*}
+     \textbf{(Induktionsschritt $n \to n+1$):}
+    \begin{align*}
+        \sum_{k=1}^{n+1}(2k-1) &= \left(\sum_{k=1}^{n}(2k-1)\right) + (2(n+1)-1) \\
+        &\overset{IV}{=} n^2 + (2n + 2 - 1) \\
+        &= n^2 + 2n + 1 = (n+1)^2 \quad \square
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Grenzen der vollständigen Induktion}
+    \begin{itemize}
+        \item \textbf{Problem:} Die Methode ist rein \textbf{verifizierend}.
+        \item Sie gibt keinen Aufschluss darüber, wie man auf das Ergebnis ($n^2$) kommt, wenn man es nicht bereits erraten hat.
+        \item Geometrische Veranschaulichungen liefern häufig intuitive Erklärungen:
+    \end{itemize}
+    \begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.6]
+    % n=1 (1 Punkt)
+    \draw[fill=black] (0,0) circle (4pt);
+    % n=2 (+3 Punkte)
+    \draw[fill=gray] (1,0) circle (4pt);
+    \draw[fill=gray] (1,1) circle (4pt);
+    \draw[fill=gray] (0,1) circle (4pt);
+    % n=3 (+5 Punkte)
+    \draw[fill=lightgray] (2,0) circle (4pt);
+    \draw[fill=lightgray] (2,1) circle (4pt);
+    \draw[fill=lightgray] (2,2) circle (4pt);
+    \draw[fill=lightgray] (1,2) circle (4pt);
+    \draw[fill=lightgray] (0,2) circle (4pt);
+    
+    \draw[dashed] (-0.4,-0.4) rectangle (0.5,0.5);
+    \draw[dashed] (-0.5,-0.5) rectangle (1.5,1.5);
+    \draw[dashed] (-0.6,-0.6) rectangle (2.5,2.5);
+\end{tikzpicture}
+\label{fig:ungerade_summe}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vorwärts-Rückwärts-Induktion (Cauchy-Induktion)}
+    Manchmal ist der Schritt $n \to n+1$ schwierig. Cauchy entwickelte daher folgendes Schema:
+    \begin{enumerate}
+        \item \textbf{Basisfall:} Zeige Gültigkeit für $n=2$.
+        \item \textbf{Vorwärtsschritt ($n \to 2n$):} Erreiche sukzessive alle Zweierpotenzen.
+        \item \textbf{Rückwärtsschritt ($n \to n-1$):} Fülle die Lücken zwischen den Zweierpotenzen.
+    \end{enumerate}
+    
+    \textbf{Anwendung:} Beweis der AGM-Ungleichung
+    \[ \sqrt[n]{a_{1}a_{2}\cdots a_{n}}\le\frac{a_{1}+a_{2}+\dots+a_{n}}{n} \]
+\end{frame}
+
+\begin{frame}{Doppelsummen}
+    \begin{itemize}
+        \item Bei endlichen Summen ist die Reihenfolge der Summation vertauschbar.
+        \item Beispiel: Summation über eine obere Dreiecksmatrix.
+        \[ \sum_{i=1}^{n}\sum_{j=i}^{n}a_{ij}=\sum_{j=1}^{n}\sum_{i=1}^{j}a_{ij} \]
+    \end{itemize}
+  Anhand der Einträge einer oberen Dreiecksmatrix lässt sich dies veranschaulichen:
+\[
+\begin{matrix}
+a_{11} & a_{12} & a_{13} & \dots & a_{1n} \\
+       & a_{22} & a_{23} & \dots & a_{2n} \\
+       &        & a_{33} & \dots & a_{3n} \\
+       &        &        & \ddots & \vdots \\
+       &        &        &        & a_{nn}
+\end{matrix}
+\]
+\end{frame}
+
+\begin{frame}{Der Summationsfaktor}
+    Lösung von Rekursionen: $a_n = c_n a_{n-1} + f_n$.
+    \begin{itemize}
+        \item Multiplikation mit Folge $s_n$, um Teleskopstruktur zu erzeugen.
+        \item Bedingung $s_n c_n = s_{n-1}$ führt zu:\[ s_n a_n = s_{n-1} a_{n-1} + s_{n}f_{n} \]
+    \item Substitution $b_n = s_n a_n$ liefert:
+    \[ b_{n}=b_{n-1}+s_{n}f_{n} \implies b_{n}=b_{0}+\sum_{k=1}^{n}s_{k}f_{k} \]
+      \item Resultierende Formel ($s_0=1$): $s_{n}=\frac{1}{c_{n}c_{n-1}\cdots c_{1}}$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Der Summationsfaktor}
+    Rekursion $a_n = 2a_{n-1} + n$ mit $a_0 = 1$.
+    \begin{enumerate}
+        \item Bestimme $s_n$: $c_n = 2 \implies s_n = \frac{1}{2^n}$.
+        \item Rekursion mit $s_n$ multiplizieren:
+        \[ \frac{a_n}{2^n} = \frac{2a_{n-1}}{2^n} + \frac{n}{2^n} \iff \frac{a_n}{2^n} = \frac{a_{n-1}}{2^{n-1}} + \frac{n}{2^n} \]
+        \item Substitution $b_n = \frac{a_n}{2^n}$:
+        \[ b_n = b_{n-1} + \frac{n}{2^n} \implies b_n = 1 + \sum_{k=1}^n \frac{k}{2^k} \]
+    \end{enumerate}
+\end{frame}
+
+\section{3. Differenzrechnung}
+
+\begin{frame}{Translations- und Differenzoperator}
+    \begin{block}{Definition (Operatoren)}
+        \begin{itemize}
+            \item Der \textbf{Translationsoperator} $E_a$ mit der Schrittweite $a$ einer Funktion ist definiert durch die Abbildung: $E_a := f(x) \to f(x+a)$.
+            \item \textbf{Vorwärts-Differenz:} $\Delta := E - I \implies \Delta f(x) = f(x+1) - f(x)$.
+            \item \textbf{Rückwärts-Differenz:} $\nabla := I - E^{-1} \implies \nabla f(x) = f(x) - f(x-1)$.
+        \end{itemize}
+    \end{block}
+    \textbf{Analogie:} Die Vorwärts-Differenz verhält sich diskret wie die Ableitung kontinuierlich.
+    Gilt $\Delta f(k) = g(k)$, ist $f$ eine diskrete Stammfunktion von $g$: $f(k) = \sum g(k)$.
+\end{frame}
+
+\begin{frame}{Fallende und steigende Faktoriellen}
+    Gewöhnliche Monome verletzen die klassische Potenzregel ($\Delta x^2 = 2x+1 \neq 2x$).
+    \begin{block}{Definition (Fallende und steigende Faktoriellen)}
+        \[ x^{\underline{n}}:=x(x-1)(x-2)\cdots(x-n+1) \]
+        \[ x^{\overline{n}}:=x(x+1)(x+2)\cdots(x+n-1) \]
+    \end{block}
+    \begin{lem}[Die diskrete Potenzregel]
+        \[ \Delta x^{\underline{n}}=n\cdot x^{\underline{n-1}} \quad \implies \quad \sum x^{\underline{n}} = \frac{x^{\underline{n+1}}}{n+1}\]
+        \[ \nabla x^{\overline{n}}=n\cdot x^{\overline{n-1}} \quad \implies \quad \sum x^{\overline{n}} = \frac{x^{\overline{n+1}}}{n+1}\]
+    \end{lem}
+\end{frame}
+
+\begin{frame}{Fallende und steigende Faktoriellen}
+    \textbf{Beweis:}
+    \footnotesize
+    \begin{align*}
+    \Delta x^{\underline{n}} &= (x+1)^{\underline{n}} - x^{\underline{n}} \\
+    &= \Big( (x+1)x(x-1)\dots(x-n+2) \Big) - \Big( x(x-1)\dots(x-n+2)(x-n+1) \Big)\\
+    &= \Big[ x(x-1)\dots(x-n+2) \Big] \cdot \Big( (x+1) - (x-n+1) \Big) \\
+    &= x^{\underline{n-1}} \cdot \big( x + 1 - x + n - 1 \big) \\
+    &= x^{\underline{n-1}} \cdot n = n \cdot x^{\underline{n-1}}\\\\
+    \nabla x^{\overline{n}} &= x^{\overline{n}} - (x-1)^{\overline{n}} \\
+    &= \Big( x(x+1)\dots(x+n-2)(x+n-1) \Big) - \Big( (x-1)x(x+1)\dots(x+n-2) \Big)\\
+    &= \Big[ x(x+1)\dots(x+n-2) \Big] \cdot \Big( (x+n-1) - (x-1) \Big) \\
+    &= x^{\overline{n-1}} \cdot \big( x + n - 1 - x + 1 \big) \\
+    &= x^{\overline{n-1}} \cdot n = n \cdot x^{\overline{n-1}}
+    \quad \square
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Fundamentalsatz der Differenzenrechnung}
+    \begin{thm}
+        Sei $\Delta f(k) = g(k)$. Dann gilt für $a \le b$:
+        \[ \sum_{k=a}^{b}g(k) = f(b+1) - f(a) \]
+    \end{thm}
+    \textbf{Beweis:}
+    \begin{align*}
+        \sum_{k=a}^{b}g(k) &= \sum_{k=a}^{b}(f(k+1)-f(k)) \\
+        &= (f(a+1)-f(a)) + \dots + (f(b+1)-f(b)) \\
+        &= f(b+1) - f(a) \quad \square
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Transformation von Polynomen}
+    Gewöhnliche Polynome müssen in die Basis der fallenden Faktoriellen mittels Stirling-Zahlen zweiter Art $S_{n,k}$ transformiert werden. Basistransformation:
+    \[ x^n = \sum_{k=0}^n S_{n,k} x^{\underline{k}} \]
+    \textbf{Beispiele:}
+    \begin{itemize}
+        \item $x^1 = x^{\underline{1}}$
+        \item $x^2 = x^2 - x + x = x(x-1) + x = x^{\underline{2}} + x^{\underline{1}}$
+        \item $x^3 = x^{\underline{3}} + 3x^{\underline{2}} + x^{\underline{1}}$
+    \end{itemize}
+    Die Vorfaktoren vor den Faktoriellen spiegeln dabei die Werte der Stirling-Zahlen wider.
+\end{frame}
+
+\begin{frame}{Transformation von Polynomen}
+    Berechnung von $\sum_{k=1}^n k^2$
+    \begin{enumerate}
+        \item \textbf{Basistransformation:} $k^2 = k^{\underline{2}} + k^{\underline{1}}$
+        \item \textbf{Bestimmung der Stammfunktion:}
+        \[ f(k) = \sum (k^{\underline{2}} + k^{\underline{1}}) = \frac{k^{\underline{3}}}{3} + \frac{k^{\underline{2}}}{2} \]
+        \item \textbf{Anwendung des Hauptsatzes:}
+        \begin{align*} \sum_{k=1}^n k^2 &= f(n+1) - f(1) = \frac{(n+1)^{\underline{3}}}{3} + \frac{(n+1)^{\underline{2}}}{2} - 0 \\
+        &= \frac{(n+1)n(n-1)}{3} + \frac{(n+1)n}{2} \\
+        &= \frac{2(n^3-n) + 3(n^2+n)}{6} \\
+        &= \frac{2n^3 + 3n^2 + n}{6} = \frac{n(n+1)(2n+1)}{6}
+        \end{align*}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Diskrete Produktregel und Partielle Summation}
+    \begin{block}{Satz: Diskrete Produktregel}
+        Mit $Ev(k) := v(k+1)$ gilt:
+        \[ \Delta(uv) = (\Delta u)(Ev) + u(\Delta v) \]
+    \end{block}
+    Umstellen nach $u \Delta v$ und anwenden des unbestimmten Summationsoperator liefert Formel der \textbf{partiellen Summation}:
+    \[ \sum u \Delta v = uv - \sum (Ev)\Delta u \]
+    Bestimmte Form:
+    \[ \sum_{k=a}^b u(k)\Delta v(k) = u(b+1)v(b+1)-u(a)v(a) - \sum_{k=a}^b v(k+1)\Delta u(k) \]
+\end{frame}
+
+\begin{frame}{Diskrete Produktregel und Partielle Summation}
+    Berechnung von $\sum_{k=1}^n k 2^k$
+    \begin{enumerate}
+        \item \textbf{Wahl von u und v:} \\ $u(k) = k \implies \Delta u(k) = 1$ \\
+        $\Delta v(k) = 2^k \implies v(k) = 2^k$ (da $\Delta 2^k = 2^{k+1} - 2^k = 2^k)$
+        \item \textbf{Anwendung der partiellien Summation:}
+        \begin{align*} \sum_{k=1}^n k 2^k &= u(n+1)v(n+1)-u(1)v(1) - \sum_{k=1}^n 2^{k+1} \cdot 1 \\
+        &= ((n+1)2^{n+1} - 2) - (2^{n+2} - 4) \\
+        &= 2^{n+1}(n+1 - 2) + 2 \\
+        &= 2^{n+1}(n-1) + 2
+        \end{align*}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Die Newton-Darstellung}
+    In der Analysis lässt sich jedes Polynom $f(x) = \sum_{k=0}^{n} a_k x^k$ über seine Koeffizienten mittels der $k$-ten Ableitungen $D^k f(0)$ an der Stelle $0$ in Form der Taylor-Entwicklung darstellen:
+\begin{align*}
+    a_k = \frac{D^k f(0)}{k!} \quad \Longrightarrow \quad f(x) = \sum_{k=0}^{n} \frac{D^k f(0)}{k!}\, x^k
+\end{align*}
+Das diskrete Analogon zur Taylor-Reihe für ein Polynom vom Grad $n$ ist die Newton-Darstellung. Anstelle von Ableitungen werden Differenzen und anstelle von Potenzen Faktoriellen verwendet.    
+    \begin{thm}[Newton-Darstellung]
+        Für jedes Polynom $f$ vom Grad $n$ gilt:
+        \[ f(x) = \sum_{k=0}^n \frac{\Delta^k f(0)}{k!} x^{\underline{k}} = \sum_{k=0}^n \Delta^k f(0) \binom{x}{k}\]
+    \end{thm}
+\end{frame}
+
+\begin{frame}{Die Newton-Darstellung}
+\textbf{Beispiel:}
+Wir betrachten das Polynom $f(x) = x^2$. 
+\begin{align*}
+    f(0) &= 0 \\
+    \Delta f(x) &= (x+1)^2 - x^2 = 2x+1 \quad \implies \quad \Delta f(0) = 1 \\
+    \Delta^2f(x) &= \Delta(2x+1) = 2 \quad \implies \quad \Delta^2f(0) = 2
+\end{align*}
+Da alle Differenzen ab $\Delta^3 f(x)=0$, liefert die Newton-Darstellung:
+\begin{align*}
+    x^2 &= \frac{0}{0!}\,x^{\underline{0}} + \frac{1}{1!}\,x^{\underline{1}} + \frac{2}{2!}\,x^{\underline{2}} = x^{\underline{1}} + x^{\underline{2}} \\
+    &= x + x(x-1) = x + x^2 - x = x^2
+\end{align*}
+\end{frame}
+
+\section{4. Zusammenfassung}
+
+\begin{frame}{Zusammenfassung der Analogien}
+    \begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|l}
+\textbf{Analysis (kontinuierlich)} & \textbf{Differenzenrechnung (diskret)} \\ \hline
+Ableitung: $f'(x) = \lim_{h \to 0} \frac{f(x+h)-f(x)}{h}$ & Vorwärts-Differenz: $\Delta f(x) = f(x+1) - f(x) \vphantom{\int}$ \\
+Stammfunktion: $F'(x) = g(x)$ & Diskrete Stammfunktion: $\Delta F(k) = g(k)$ \\
+Bestimmtes Integral: $\int_a^b g(x)\,dx$ & Endliche Summe: $\sum_{k=a}^{b} g(k)$ \\
+Hauptsatz: $\int_a^b g(x) \,dx = F(b) - F(a)$ & Fundamentalsatz: $\sum_{k=a}^b g(k) = F(b+1) - F(a)$ \\
+Natürliche Potenzen: $x^n$ & Fallende Faktoriellen: $x^{\underline n}$ \\
+Ableitung von Potenzen: $\frac{d}{dx} x^n = n x^{n-1}$ & Differenz von fallenden Faktoriellen: $\Delta x^{\underline{n}} = n x^{\underline{n-1}}$ \\
+Exponentialfunktion: $\frac{d}{dx}e^{cx} = c \cdot e^{cx}$ & Exponentialfunktion: $\Delta(1+c)^x = c \cdot (1+c)^x$ \\
+Produktregel: $\frac{d}{dx}(uv) = u'v + uv'$ & Diskrete Produktregel: $\Delta(uv) = (\Delta u)(Ev) + u(\Delta v)$ \\
+Partielle Integration: $\int u\,dv = uv-\int v\,du$ & Partielle Summation: $\sum u\,\Delta v = uv-\sum (Ev)\,\Delta u$ \\
+Taylor-Reihe: $f(x) = \sum \frac{D^k f(0)}{k!} x^k$ & Newton-Darstellung: $f(x) = \sum \frac{\Delta^k f(0)}{k!} x^{\underline{k}}$ \\
+\end{tabular}%
+}
+\end{center}
+\vspace{0.5em}
+\end{frame}
+
+\begin{frame}{Literatur}
+    [1] Martin Aigner, \textit{Diskrete Mathematik}, 6. Auflage, Vieweg+Teubner Verlag, 2006.
+\end{frame}
+
+\end{document}
+
